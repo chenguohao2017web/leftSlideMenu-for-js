@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        .container {
+            display: flex;
+        }
+
+        .menu-wrap {
+            width: 300px;
+            border:1px solid #ccc;
+        }
+
+        .content {
+            flex:1;
+            background: blue;
+            color: #fff;
+            height:500px
+        }
+
+        .item {
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .item .title {
+            height: 50px;
+            line-height: 50px;
+        }
+
+        .item.active .title {
+            background: red;
+            color: #fff;
+        }
+
+        .item .text {
+            width: 100%;
+            border: 1px solid #eee;
+            height: 50px;
+            line-height: 50px;
+            text-align: center;
+        }
+
+        .item .text.active {
+            background: #ccc;
+        }
+
+        .item .text:hover {
+            background: #ccc;
+        }
+
+        .item .children {
+            display: none;
+        }
+
+        .item .children.block {
+
+            display: block;
+        }
+
+        .content .showText {
+            display: none;
+        }
+
+        .content .showText.block {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="menu-wrap">
+            <div class="item active">
+                <div class="title" data-index="0">首页</div>
+            </div>
+            <div class="item">
+                <div class="title">协会简介</div>
+                <div class="children">
+                    <div class="text" data-index="1">协会动态</div>
+                    <div class="text" data-index="2">协会详情</div>
+                </div>
+            </div>
+            <div class="item">
+                <div class="title">会员服务</div>
+                <div class="children">
+                    <div class="text" data-index="3">会员管理</div>
+                    <div class="text" data-index="4">加入会员</div>
+                </div>
+            </div>
+        </div>
+        <div class="content">
+            <div class="showText block">我是首页内容</div>
+            <div class="showText">协会动态内容</div>
+            <div class="showText">详情</div>
+            <div class="showText">会员管理</div>
+            <div class="showText">加入</div>
+        </div>
+    </div>
+    <script>
+        window.onload = function () {
+            eventInit()
+        }
+        function eventInit() {
+            const menuWrap = document.querySelector('.menu-wrap');
+            const itemArr = Array.from(menuWrap.children)
+            itemArr.forEach(item => {
+                item.onclick = function (e) {
+                    // 添加当前选项class 
+                    for (let i = 0; i < itemArr.length; i++) {
+                        itemArr[i].className = 'item'
+                    }
+                    this.className += ' active'
+                    // 菜单展开或收起
+                    const childrenArr = this.querySelectorAll('.children')
+                    Array.from(childrenArr).forEach(item => {
+                        let className = item.className
+                        if (className.indexOf('block') === -1) {
+                            // 此时是隐藏的
+                            item.className += ' block'
+                        } else {
+                            item.className = 'children'
+                        }
+                    })
+                    // 动态显示tab内容
+                    if (e.target.getAttribute('data-index')) {
+                        const index = e.target.getAttribute('data-index')
+                        setTab(index)
+                    }
+
+                    // 当点击是首页时候清除有children 的active样式
+                    if(e.target.getAttribute('data-index')) {
+                        const textArr = document.querySelectorAll('.text')
+                        Array.from(textArr).forEach(item=>{
+                            item.className = 'text'
+                        })
+                    }
+                }
+            })
+            // 为选中的二级菜单添加样式
+            const textArr = document.querySelectorAll('.text')
+            Array.from(textArr).forEach(item => {
+                item.onclick = function (e) {
+                    if (e.target.getAttribute('data-index')) {
+                        const index = e.target.getAttribute('data-index')
+                        setTab(index)
+                    }
+                    Array.from(textArr).forEach(i => {
+                        i.className = 'text'
+                    })
+                    this.className += ' active'
+
+                    // 点击二级菜单同时要将一级菜单的样式进行切换
+                    for (let i = 0; i < itemArr.length; i++) {
+                        itemArr[i].className = 'item'
+                    }
+                    this.parentNode.parentNode.className += ' active'
+
+                    e.stopPropagation();
+                }
+            })
+
+
+        }
+        function setTab(index) {
+            let showTextArr = document.querySelectorAll('.showText')
+            Array.from(showTextArr).forEach(item => {
+                item.className = 'showText'
+            })
+            showTextArr[index].className += ' block'
+        }
+    </script>
+</body>
+
+</html>
